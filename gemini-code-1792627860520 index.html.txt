@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Is Fun! - Kuiz Pertukaran Unit</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        funYellow: '#FFD166',
+                        funPink: '#EF476F',
+                        funBlue: '#118AB2',
+                        funGreen: '#06D6A0',
+                        funPurple: '#8338EC',
+                        funDark: '#073B4C'
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #F8F9FA;
+            background-image: radial-gradient(#118AB2 0.75px, transparent 0.75px), radial-gradient(#118AB2 0.75px, #F8F9FA 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+        .heading-font {
+            font-family: 'Fredoka', cursive;
+        }
+        .custom-shadow {
+            box-shadow: 0px 8px 0px 0px rgba(0,0,0,0.15);
+        }
+        .btn-bounce:hover {
+            transform: translateY(-3px);
+        }
+        .btn-bounce:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-funDark flex flex-col justify-between">
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b-4 border-funBlue shadow-sm sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('screen-welcome')">
+                <div class="bg-funYellow p-2 rounded-2xl border-2 border-funDark text-2xl font-bold text-funDark heading-font">
+                    <i class="fa-solid fa-calculator text-funPink"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold heading-font text-funBlue tracking-wide leading-none">MATH IS FUN!</h1>
+                    <p class="text-xs font-semibold text-funPink">Pertukaran Unit (Tahun 4, 5 & 6)</p>
+                </div>
+            </div>
+            
+            <button onclick="openTeacherModal()" class="bg-funPurple text-white px-4 py-2 rounded-xl font-bold border-2 border-funDark hover:bg-opacity-90 transition btn-bounce text-sm flex items-center gap-2">
+                <i class="fa-solid fa-user-lock"></i> Dashboard Guru
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- SCREEN 1: WELCOME / SETUP -->
+        <div id="screen-welcome" class="bg-white rounded-3xl p-6 md:p-10 border-4 border-funDark custom-shadow transition-all">
+            <div class="text-center mb-8">
+                <span class="bg-funYellow text-funDark px-4 py-1.5 rounded-full text-sm font-bold border-2 border-funDark uppercase tracking-wider inline-block mb-3">
+                    🚀 Jom Uji Minda!
+                </span>
+                <h2 class="text-3xl md:text-5xl font-extrabold heading-font text-funBlue mb-3">Cabaran Pertukaran Unit</h2>
+                <p class="text-gray-600 max-w-lg mx-auto font-medium">Lakukan latihan interaktif yang merangkumi Panjang, Jisim, Isi Padu Cecair, serta Masa & Waktu.</p>
+            </div>
+
+            <form id="start-form" onsubmit="event.preventDefault(); startQuiz();" class="space-y-6 max-w-md mx-auto">
+                <div>
+                    <label class="block font-bold text-funDark mb-2 text-lg heading-font">Nama Murid:</label>
+                    <input type="text" id="student-name" required placeholder="Masukkan nama penuh anda..." 
+                        class="w-full px-4 py-3 rounded-2xl border-2 border-funDark focus:border-funBlue focus:ring-2 focus:ring-funBlue outline-none text-lg font-medium">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-funDark mb-2 text-lg heading-font">Tahun / Tingkatan:</label>
+                    <select id="student-year" required class="w-full px-4 py-3 rounded-2xl border-2 border-funDark focus:border-funBlue focus:ring-2 focus:ring-funBlue outline-none text-lg font-medium bg-white">
+                        <option value="Tahun 4">Tahun 4</option>
+                        <option value="Tahun 5">Tahun 5</option>
+                        <option value="Tahun 6">Tahun 6</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-funDark mb-2 text-lg heading-font">Pilih Tajuk Soalan:</label>
+                    <select id="quiz-topic" class="w-full px-4 py-3 rounded-2xl border-2 border-funDark focus:border-funBlue focus:ring-2 focus:ring-funBlue outline-none text-lg font-medium bg-white">
+                        <option value="all">🌟 Semua Tajuk Campuran</option>
+                        <option value="panjang">📏 Panjang (mm, cm, m, km)</option>
+                        <option value="jisim">⚖️ Jisim (g, kg)</option>
+                        <option value="isipadu">🧪 Isi Padu Cecair (mℓ, ℓ)</option>
+                        <option value="masa">⏱️ Masa & Waktu (jam, minit, hari, dekad, abad)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-funGreen text-funDark font-extrabold text-xl py-4 rounded-2xl border-4 border-funDark hover:bg-opacity-90 transition btn-bounce shadow-md">
+                    MULA KUIZ SEKARANG <i class="fa-solid fa-play ml-2"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- SCREEN 2: QUIZ INTERACTION -->
+        <div id="screen-quiz" class="hidden space-y-6">
+            <!-- Progress Bar & Score -->
+            <div class="bg-white rounded-2xl p-4 border-3 border-funDark flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <span id="quiz-year-badge" class="bg-funPurple text-white px-3 py-1 rounded-xl text-xs font-bold uppercase">Tahun 4</span>
+                    <span id="quiz-topic-badge" class="bg-funYellow text-funDark px-3 py-1 rounded-xl text-xs font-bold uppercase">Panjang</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="text-sm font-bold text-gray-500">
+                        Soalan: <span id="current-q-num" class="text-funBlue font-extrabold text-lg">1</span> / <span id="total-q-num">10</span>
+                    </div>
+                    <div class="text-sm font-bold text-gray-500">
+                        Markah: <span id="current-score" class="text-funGreen font-extrabold text-lg">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 border-4 border-funDark custom-shadow relative">
+                <div id="question-text" class="text-xl md:text-2xl font-bold text-funDark mb-8 leading-relaxed">
+                    <!-- Soalan dipapar di sini -->
+                </div>
+
+                <!-- Answer Options -->
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Pilihan jawapan dinamik -->
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="feedback-box" class="hidden mt-6 p-4 rounded-2xl border-2 font-bold text-center text-lg"></div>
+
+                <!-- Next Button -->
+                <div class="mt-8 flex justify-end">
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden bg-funBlue text-white font-extrabold text-lg px-8 py-3 rounded-2xl border-3 border-funDark hover:bg-opacity-90 transition btn-bounce">
+                        Soalan Seterusnya <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: RESULT -->
+        <div id="screen-result" class="hidden bg-white rounded-3xl p-8 md:p-10 border-4 border-funDark custom-shadow text-center">
+            <div id="result-icon" class="text-6xl mb-4">🏆</div>
+            <h2 class="text-3xl md:text-4xl font-extrabold heading-font text-funBlue mb-2">Tahniah! Kuiz Selesai!</h2>
+            <p id="result-greeting" class="text-gray-600 font-semibold mb-6">Syabas kepada murid hebat!</p>
+
+            <div class="bg-funYellow/30 border-3 border-funDark rounded-3xl p-6 max-w-sm mx-auto mb-8">
+                <p class="text-sm font-bold uppercase text-gray-500 mb-1">Keputusan Anda</p>
+                <div class="text-5xl font-black heading-font text-funDark mb-2" id="final-score-display">80%</div>
+                <p class="text-sm font-semibold text-gray-700" id="final-stats-display">Menjawab 8 daripada 10 soalan dengan betul.</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="restartQuiz()" class="bg-funGreen text-funDark font-extrabold text-lg px-8 py-3.5 rounded-2xl border-3 border-funDark hover:bg-opacity-90 transition btn-bounce">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Cuba Lagi
+                </button>
+                <button onclick="showScreen('screen-welcome')" class="bg-funYellow text-funDark font-extrabold text-lg px-8 py-3.5 rounded-2xl border-3 border-funDark hover:bg-opacity-90 transition btn-bounce">
+                    <i class="fa-solid fa-house mr-2"></i> Menu Utama
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t-2 border-gray-200 py-4 text-center text-xs text-gray-500 font-medium">
+        Math is Fun! • Modul Pertukaran Unit Matematik Sekolah Rendah
+    </footer>
+
+    <!-- TEACHER DASHBOARD LOGIN MODAL -->
+    <div id="teacher-modal" class="fixed inset-0 bg-funDark/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl border-4 border-funDark p-6 md:p-8 max-w-md w-full custom-shadow relative">
+            <button onclick="closeTeacherModal()" class="absolute top-4 right-4 text-gray-400 hover:text-funDark text-2xl font-bold">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="bg-funPurple text-white w-14 h-14 rounded-2xl border-2 border-funDark flex items-center justify-center text-2xl font-bold mx-auto mb-3">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-2xl font-bold heading-font text-funDark">Laluan Guru / Admin</h3>
+                <p class="text-xs text-gray-500 font-medium">Sila masukkan kod laluan keselamatan untuk akses dashboard.</p>
+            </div>
+
+            <form id="login-form" onsubmit="event.preventDefault(); verifyTeacherPassword();" class="space-y-4">
+                <div>
+                    <input type="password" id="teacher-password" placeholder="Masukkan Password" required 
+                        class="w-full px-4 py-3 text-center text-2xl font-mono tracking-widest rounded-2xl border-2 border-funDark focus:border-funPurple outline-none">
+                </div>
+                <p id="password-error" class="text-funPink text-xs font-bold text-center hidden">
+                    ❌ Kata laluan tidak sah! Sila cuba lagi.
+                </p>
+                <button type="submit" class="w-full bg-funPurple text-white font-extrabold text-lg py-3 rounded-2xl border-3 border-funDark hover:bg-opacity-90 transition btn-bounce">
+                    Masuk Dashboard
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TEACHER DASHBOARD SCREEN (MODAL / OVERLAY FULLSCREEN) -->
+    <div id="teacher-dashboard" class="fixed inset-0 bg-gray-100 z-50 overflow-y-auto hidden">
+        <div class="bg-white border-b-4 border-funPurple p-4 sticky top-0 z-10 shadow-sm">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span class="bg-funPurple text-white p-2 rounded-xl border border-funDark">
+                        <i class="fa-solid fa-chart-line text-xl"></i>
+                    </span>
+                    <div>
+                        <h2 class="text-xl font-bold heading-font text-funDark">Dashboard Prestasi Murid</h2>
+                        <p class="text-xs text-gray-500">Rekod Jawapan & Markah Murid</p>
+                    </div>
+                </div>
+                <button onclick="closeTeacherDashboard()" class="bg-funPink text-white font-bold px-4 py-2 rounded-xl border-2 border-funDark text-sm btn-bounce">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+                </button>
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto p-4 md:p-8 space-y-6">
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl border-3 border-funDark shadow-sm flex items-center gap-4">
+                    <div class="bg-funBlue/20 text-funBlue p-4 rounded-2xl text-2xl">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase">Jumlah Murid</p>
+                        <p id="dash-stat-count" class="text-3xl font-extrabold heading-font text-funDark">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-3 border-funDark shadow-sm flex items-center gap-4">
+                    <div class="bg-funGreen/20 text-funGreen p-4 rounded-2xl text-2xl">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase">Purata Markah</p>
+                        <p id="dash-stat-avg" class="text-3xl font-extrabold heading-font text-funDark">0%</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-3 border-funDark shadow-sm flex items-center gap-4">
+                    <div class="bg-funYellow/30 text-funDark p-4 rounded-2xl text-2xl">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase">Skor Tertinggi</p>
+                        <p id="dash-stat-high" class="text-3xl font-extrabold heading-font text-funDark">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table of Records -->
+            <div class="bg-white rounded-3xl border-3 border-funDark p-6 shadow-sm">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold heading-font text-funDark">Senarai Rekod Percubaan</h3>
+                    <button onclick="clearStudentData()" class="text-xs font-bold text-funPink hover:underline">
+                        <i class="fa-solid fa-trash mr-1"></i> Padam Semua Rekod
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b-2 border-gray-200 text-gray-500 text-xs uppercase font-bold">
+                                <th class="p-3">Tarikh / Masa</th>
+                                <th class="p-3">Nama Murid</th>
+                                <th class="p-3">Tahun</th>
+                                <th class="p-3">Tajuk</th>
+                                <th class="p-3">Markah</th>
+                                <th class="p-3">Peratus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body" class="divide-y divide-gray-100 font-medium text-sm">
+                            <!-- Data dimasukkan secara JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="no-data-msg" class="text-center py-8 text-gray-400 font-semibold hidden">
+                    Belum ada rekod murid yang mengambil kuiz.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // QUESTION BANK
+        const questionBank = [
+            // PANJANG
+            {
+                topic: 'panjang',
+                years: ['Tahun 4', 'Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $5\\text{ cm}$ kepada $\\text{mm}$.',
+                options: ['$50\\text{ mm}$', '$500\\text{ mm}$', '$5\\text{ mm}$', '$0.5\\text{ mm}$'],
+                answer: 0,
+                hint: 'Petua: $1\\text{ cm} = 10\\text{ mm}$'
+            },
+            {
+                topic: 'panjang',
+                years: ['Tahun 4', 'Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $3.2\\text{ m}$ kepada $\\text{cm}$.',
+                options: ['$32\\text{ cm}$', '$320\\text{ cm}$', '$3200\\text{ cm}$', '$0.32\\text{ cm}$'],
+                answer: 1,
+                hint: 'Petua: $1\\text{ m} = 100\\text{ cm}$'
+            },
+            {
+                topic: 'panjang',
+                years: ['Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $7\\text{ km } 50\\text{ m}$ kepada $\\text{m}$.',
+                options: ['$750\\text{ m}$', '$7050\\text{ m}$', '$7500\\text{ m}$', '$7005\\text{ m}$'],
+                answer: 1,
+                hint: 'Petua: $1\\text{ km} = 1000\\text{ m}$'
+            },
+            {
+                topic: 'panjang',
+                years: ['Tahun 5', 'Tahun 6'],
+                question: 'Nyatakan $\\frac{3}{4}\\text{ km}$ dalam unit $\\text{m}$.',
+                options: ['$750\\text{ m}$', '$250\\text{ m}$', '$500\\text{ m}$', '$75\\text{ m}$'],
+                answer: 0,
+                hint: 'Petua: $\\frac{3}{4} \\times 1000\\text{ m}$'
+            },
+            // JISIM
+            {
+                topic: 'jisim',
+                years: ['Tahun 4', 'Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $4000\\text{ g}$ kepada $\\text{kg}$.',
+                options: ['$40\\text{ kg}$', '$0.4\\text{ kg}$', '$4\\text{ kg}$', '$400\\text{ kg}$'],
+                answer: 2,
+                hint: 'Petua: $1000\\text{ g} = 1\\text{ kg}$'
+            },
+            {
+                topic: 'jisim',
+                years: ['Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $2.5\\text{ kg}$ kepada $\\text{g}$.',
+                options: ['$250\\text{ g}$', '$2500\\text{ g}$', '$25\\text{ g}$', '$25000\\text{ g}$'],
+                answer: 1,
+                hint: 'Petua: Darab dengan $1000$'
+            },
+            {
+                topic: 'jisim',
+                years: ['Tahun 6'],
+                question: 'Tukarkan $1\\frac{1}{2}\\text{ kg}$ kepada $\\text{g}$.',
+                options: ['$1200\\text{ g}$', '$1050\\text{ g}$', '$1500\\text{ g}$', '$1250\\text{ g}$'],
+                answer: 2,
+                hint: 'Petua: $1\\text{ kg} = 1000\\text{ g}$, $\\frac{1}{2}\\text{ kg} = 500\\text{ g}$'
+            },
+            // ISIPADU CECAIR
+            {
+                topic: 'isipadu',
+                years: ['Tahun 4', 'Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $6\\text{ }\u2113$ kepada $\\text{m}\u2113$.',
+                options: ['$60\\text{ m}\u2113$', '$600\\text{ m}\u2113$', '$6000\\text{ m}\u2113$', '$60000\\text{ m}\u2113$'],
+                answer: 2,
+                hint: 'Petua: $1\\text{ }\u2113 = 1000\\text{ m}\u2113$'
+            },
+            {
+                topic: 'isipadu',
+                years: ['Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $850\\text{ m}\u2113$ kepada $\\text{ }\u2113$.',
+                options: ['$8.5\\text{ }\u2113$', '$0.85\\text{ }\u2113$', '$85\\text{ }\u2113$', '$0.085\\text{ }\u2113$'],
+                answer: 1,
+                hint: 'Petua: Bahagi dengan $1000$'
+            },
+            {
+                topic: 'isipadu',
+                years: ['Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $3\\text{ }\u2113\\text{ }20\\text{ m}\u2113$ kepada $\\text{m}\u2113$.',
+                options: ['$3200\\text{ m}\u2113$', '$3020\\text{ m}\u2113$', '$320\\text{ m}\u2113$', '$3002\\text{ m}\u2113$'],
+                answer: 1,
+                hint: 'Petua: $3\\text{ }\u2113 = 3000\\text{ m}\u2113$'
+            },
+            // MASA DAN WAKTU
+            {
+                topic: 'masa',
+                years: ['Tahun 4', 'Tahun 5', 'Tahun 6'],
+                question: 'Berapakah bilangan minit dalam $2\\text{ jam } 15\\text{ minit}$?',
+                options: ['$135\\text{ minit}$', '$120\\text{ minit}$', '$145\\text{ minit}$', '$75\\text{ minit}$'],
+                answer: 0,
+                hint: 'Petua: $1\\text{ jam} = 60\\text{ minit}$'
+            },
+            {
+                topic: 'masa',
+                years: ['Tahun 4', 'Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $3\\text{ hari}$ kepada unit $\\text{jam}$.',
+                options: ['$36\\text{ jam}$', '$48\\text{ jam}$', '$72\\text{ jam}$', '$60\\text{ jam}$'],
+                answer: 2,
+                hint: 'Petua: $1\\text{ hari} = 24\\text{ jam}$'
+            },
+            {
+                topic: 'masa',
+                years: ['Tahun 5', 'Tahun 6'],
+                question: 'Berapakah dekad dalam $50\\text{ tahun}$?',
+                options: ['$5\\text{ dekad}$', '$50\\text{ dekad}$', '$0.5\\text{ dekad}$', '$500\\text{ dekad}$'],
+                answer: 0,
+                hint: 'Petua: $1\\text{ dekad} = 10\\text{ tahun}$'
+            },
+            {
+                topic: 'masa',
+                years: ['Tahun 5', 'Tahun 6'],
+                question: 'Tukarkan $2\\text{ abad } 4\\text{ dekad}$ kepada unit $\\text{tahun}$.',
+                options: ['$240\\text{ tahun}$', '$204\\text{ tahun}$', '$24\\text{ tahun}$', '$2400\\text{ tahun}$'],
+                answer: 0,
+                hint: 'Petua: $1\\text{ abad} = 100\\text{ tahun}$, $1\\text{ dekad} = 10\\text{ tahun}$'
+            }
+        ];
+
+        // APP STATE
+        let currentStudent = { name: '', year: '', topic: '' };
+        let activeQuestions = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // SCREEN CONTROL
+        function showScreen(screenId) {
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        // START QUIZ
+        function startQuiz() {
+            const name = document.getElementById('student-name').value.trim();
+            const year = document.getElementById('student-year').value;
+            const topic = document.getElementById('quiz-topic').value;
+
+            if (!name) return;
+
+            currentStudent = { name, year, topic };
+
+            // Filter questions
+            let filtered = questionBank.filter(q => q.years.includes(year));
+            if (topic !== 'all') {
+                filtered = filtered.filter(q => q.topic === topic);
+            }
+
+            // Shuffle questions
+            activeQuestions = [...filtered].sort(() => 0.5 - Math.random()).slice(0, 10);
+
+            if (activeQuestions.length === 0) {
+                alert('Tiada soalan ditemui untuk kriteria ini. Sila pilih tajuk lain.');
+                return;
+            }
+
+            // Reset States
+            currentQIndex = 0;
+            score = 0;
+
+            // Update UI Badges
+            document.getElementById('quiz-year-badge').innerText = year;
+            document.getElementById('quiz-topic-badge').innerText = topic.toUpperCase();
+            document.getElementById('total-q-num').innerText = activeQuestions.length;
+            document.getElementById('current-score').innerText = '0';
+
+            showScreen('screen-quiz');
+            loadQuestion();
+        }
+
+        // LOAD QUESTION
+        function loadQuestion() {
+            isAnswered = false;
+            const qData = activeQuestions[currentQIndex];
+
+            document.getElementById('current-q-num').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerHTML = qData.question;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full p-4 rounded-2xl border-3 border-funDark text-left font-bold text-lg bg-white hover:bg-funYellow/20 transition btn-bounce flex items-center justify-between';
+                btn.innerHTML = `<span>${opt}</span> <i class="fa-regular fa-circle text-gray-300"></i>`;
+                btn.onclick = () => checkAnswer(idx, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // CHECK ANSWER
+        function checkAnswer(selectedIndex, btnElement) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const qData = activeQuestions[currentQIndex];
+            const optionsBtns = document.getElementById('options-container').children;
+            const feedbackBox = document.getElementById('feedback-box');
+
+            if (selectedIndex === qData.answer) {
+                score++;
+                document.getElementById('current-score').innerText = score;
+                btnElement.className = 'w-full p-4 rounded-2xl border-3 border-funDark text-left font-bold text-lg bg-funGreen text-funDark transition flex items-center justify-between';
+                btnElement.querySelector('i').className = 'fa-solid fa-circle-check text-funDark';
+
+                feedbackBox.className = 'mt-6 p-4 rounded-2xl border-2 border-funDark bg-funGreen/20 text-funDark font-bold text-center text-lg';
+                feedbackBox.innerHTML = '🎉 Syabas! Jawapan anda Betul!';
+            } else {
+                btnElement.className = 'w-full p-4 rounded-2xl border-3 border-funDark text-left font-bold text-lg bg-funPink text-white transition flex items-center justify-between';
+                btnElement.querySelector('i').className = 'fa-solid fa-circle-xmark text-white';
+
+                // Highlight correct
+                const correctBtn = optionsBtns[qData.answer];
+                correctBtn.className = 'w-full p-4 rounded-2xl border-3 border-funDark text-left font-bold text-lg bg-funGreen text-funDark transition flex items-center justify-between';
+
+                feedbackBox.className = 'mt-6 p-4 rounded-2xl border-2 border-funDark bg-funPink/20 text-funPink font-bold text-center text-lg';
+                feedbackBox.innerHTML = `❌ Kurang Tepat! ${qData.hint}`;
+            }
+
+            feedbackBox.classList.remove('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        // NEXT QUESTION
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < activeQuestions.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // FINISH QUIZ
+        function finishQuiz() {
+            const percentage = Math.round((score / activeQuestions.length) * 100);
+            
+            document.getElementById('final-score-display').innerText = `${percentage}%`;
+            document.getElementById('final-stats-display').innerText = `Menjawab ${score} daripada ${activeQuestions.length} soalan dengan betul.`;
+
+            // Save result to localStorage
+            saveStudentResult(currentStudent.name, currentStudent.year, currentStudent.topic, score, activeQuestions.length, percentage);
+
+            // Confetti effect if good score
+            if (percentage >= 70) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+
+            showScreen('screen-result');
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        // SAVE DATA TO LOCAL STORAGE
+        function saveStudentResult(name, year, topic, score, total, percentage) {
+            const records = JSON.parse(localStorage.getItem('mathQuizRecords') || '[]');
+            const newRecord = {
+                id: Date.now(),
+                date: new Date().toLocaleString('ms-MY'),
+                name,
+                year,
+                topic: topic.toUpperCase(),
+                score: `${score}/${total}`,
+                percentage
+            };
+            records.push(newRecord);
+            localStorage.setItem('mathQuizRecords', JSON.stringify(records));
+        }
+
+        // TEACHER DASHBOARD LOGIC (PASSWORD: 654)
+        function openTeacherModal() {
+            document.getElementById('teacher-modal').classList.remove('hidden');
+            document.getElementById('teacher-password').value = '';
+            document.getElementById('password-error').classList.add('hidden');
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('teacher-modal').classList.add('hidden');
+        }
+
+        function verifyTeacherPassword() {
+            const pwd = document.getElementById('teacher-password').value;
+            if (pwd === '654') {
+                closeTeacherModal();
+                openTeacherDashboard();
+            } else {
+                document.getElementById('password-error').classList.remove('hidden');
+            }
+        }
+
+        function openTeacherDashboard() {
+            renderDashboardData();
+            document.getElementById('teacher-dashboard').classList.remove('hidden');
+        }
+
+        function closeTeacherDashboard() {
+            document.getElementById('teacher-dashboard').classList.add('hidden');
+        }
+
+        function renderDashboardData() {
+            const records = JSON.parse(localStorage.getItem('mathQuizRecords') || '[]');
+            const tbody = document.getElementById('student-table-body');
+            const noDataMsg = document.getElementById('no-data-msg');
+
+            tbody.innerHTML = '';
+
+            if (records.length === 0) {
+                noDataMsg.classList.remove('hidden');
+                document.getElementById('dash-stat-count').innerText = '0';
+                document.getElementById('dash-stat-avg').innerText = '0%';
+                document.getElementById('dash-stat-high').innerText = '0%';
+                return;
+            }
+
+            noDataMsg.classList.add('hidden');
+
+            let totalPercentage = 0;
+            let highestScore = 0;
+
+            records.reverse().forEach(r => {
+                totalPercentage += r.percentage;
+                if (r.percentage > highestScore) highestScore = r.percentage;
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50';
+                tr.innerHTML = `
+                    <td class="p-3 text-gray-400 text-xs">${r.date}</td>
+                    <td class="p-3 font-bold text-funDark">${r.name}</td>
+                    <td class="p-3"><span class="bg-funPurple/10 text-funPurple font-bold px-2.5 py-1 rounded-lg text-xs">${r.year}</span></td>
+                    <td class="p-3 text-xs font-semibold text-gray-600">${r.topic}</td>
+                    <td class="p-3 font-bold">${r.score}</td>
+                    <td class="p-3"><span class="font-extrabold ${r.percentage >= 70 ? 'text-funGreen' : 'text-funPink'}">${r.percentage}%</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const avg = Math.round(totalPercentage / records.length);
+            document.getElementById('dash-stat-count').innerText = records.length;
+            document.getElementById('dash-stat-avg').innerText = `${avg}%`;
+            document.getElementById('dash-stat-high').innerText = `${highestScore}%`;
+        }
+
+        function clearStudentData() {
+            if (confirm('Adakah anda pasti mahu memadam semua rekod murid?')) {
+                localStorage.removeItem('mathQuizRecords');
+                renderDashboardData();
+            }
+        }
+    </script>
+</body>
+</html>
+```eof
+
+<FollowUp>
+  <p>Ciri-ciri utama aplikasi kuiz yang dibina:</p>
+  <ul>
+    <li><strong>Tema Math is Fun!</strong>: Reka bentuk ceria, kemas, dan menarik minat murid Tahun 4, 5, dan 6.</li>
+    <li><strong>Merangkumi 4 Tajuk Utama</strong>: Pertukaran unit Panjang ($\text{mm}, \text{cm}, \text{m}, \text{km}$), Jisim ($\text{g}, \text{kg}$), Isi Padu Cecair ($\text{m}\ell, \ell$), dan Masa &amp; Waktu.</li>
+    <li><strong>Petua &amp; Maklum Balas Serta-merta</strong>: Setiap soalan menyediakan petua pertukaran unit apabila murid menjawab.</li>
+    <li><strong>Dashboard Guru Tertutup</strong>:
+      <ul>
+        <li>Dilindungi dengan **Password: 654**.</li>
+        <li>Boleh melihat nama murid, tahun, tajuk yang dipilih, markah, serta peratusan keputusan secara automatik.</li>
+      </ul>
+    </li>
+  </ul>
+</FollowUp>
